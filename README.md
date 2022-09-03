@@ -21,7 +21,7 @@ ENV GO111MODULE=on
 RUN go get 
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -ldflags="-s -w" -o app .
 
-# Execute Stage
+# Running Stage
 FROM alpine
 
 WORKDIR /app
