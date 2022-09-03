@@ -78,7 +78,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          tags: ${{ secrets.DOCKER_HUB_USER }}/${{ env.IMAGE_NAME }}:${{ github.sha }},${{ secrets.DOCKER_HUB_USER }}/${{ env.IMAGE_NAME }}:latest
 ~~~
 
 ### 3. 해당 branch에 코드 push 후 빌드 결과 확인
@@ -88,3 +88,6 @@ jobs:
 ![docker hub 1](./imgs/docker-hub-1.png)
 
 ![docker hub 2](./imgs/docker-hub-2.png)
+
+### 4. Image Pull 하여 실행 확인
+
