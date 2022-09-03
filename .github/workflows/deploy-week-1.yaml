@@ -30,6 +30,6 @@ jobs:
 
       - name: Build and push Docker images
         uses: docker/build-push-action@v3.1.1
-        with: 
+        with:
           push: true
-          tags: {{ secret.DOCKER_HUB_USER }}/simple-app:{{ github.sha }}
+          tags: {{ secret.DOCKER_HUB_USER }}/simple-app:${GITHUB_SHA}
