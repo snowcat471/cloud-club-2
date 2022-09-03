@@ -74,6 +74,7 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USER }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
+        # latest 태그도 추가하여 같이 Push
       - name: Build and Push Image
         uses: docker/build-push-action@v3
         with:
@@ -91,3 +92,16 @@ jobs:
 
 ### 4. Image Pull 하여 실행 확인
 
+~~~bash
+# container 생성
+$ docker run -d -p 3000:3000 snowcat471/simple-app
+
+# container 확인
+$ docker ps 
+CONTAINER ID   IMAGE                     COMMAND      CREATED           ...
+d5a8d59a75c2   snowcat471/simple-app     "./app"      10 seconds ago    ...
+
+# 앱 실행 확인
+$ curl localhost:3000
+Hello
+~~~
