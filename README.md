@@ -47,7 +47,7 @@ kubernetes   ClusterIP   10.96.0.1       <none>        443/TCP   51m
 web-app      ClusterIP   10.111.201.46   <none>        80/TCP    9s
 
 # endpoint 연결 확인
-$ describe svc web-app
+$ kubectl describe svc web-app
 Name:              web-app
 Namespace:         default
 Labels:            app=web-app
