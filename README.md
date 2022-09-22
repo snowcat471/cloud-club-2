@@ -466,3 +466,39 @@ web-app-857b75488d-xkqxt   1/1     Terminating         0          9m56s
 ...
 ~~~
 
+### Rollout
+
+~~~bash
+# 새버전 배포
+$ kubectl apply -f deploy.yaml # v2 버전 적용
+
+# rollout status
+$ kubectl rollout status deploy web-app
+Waiting for deployment "web-app" rollout to finish: 3 out of 7 new replicas have been updated...
+Waiting for deployment "web-app" rollout to finish: 3 out of 7 new replicas have been updated...
+Waiting for deployment "web-app" rollout to finish: 4 out of 7 new replicas have been updated...
+Waiting for deployment "web-app" rollout to finish: 4 out of 7 new replicas have been updated...
+Waiting for deployment "web-app" rollout to finish: 5 out of 7 new replicas have been updated...
+.
+.
+.
+Waiting for deployment "web-app" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "web-app" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "web-app" rollout to finish: 6 of 7 updated replicas are available...
+deployment "web-app" successfully rolled out
+
+# rollout history
+$ kubectl rollout history deploy web-app
+REVISION  CHANGE-CAUSE
+1         <none>
+2         <none>
+
+# rollback
+$ kubectl rollout undo deploy web-app
+$ kubectl rollout undo deploy web-app --to-revision=1
+
+$ kubectl rollout history deploy web-app
+REVISION  CHANGE-CAUSE
+2         <none>
+3         <none>
+~~~

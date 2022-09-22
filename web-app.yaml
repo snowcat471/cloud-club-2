@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: web-app
+  name: web-app
+spec:
+  containers:
+  - image: snowcat471/simple-app:v1
+    name: web-app
