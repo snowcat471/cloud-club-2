@@ -98,7 +98,7 @@ External Traffic Policy:  Cluster # <pod ip>:<port>
 Events:                   <none>
 ~~~
 
-~~~
+~~~bash
 # minikube ip 확인 
 $ minikube ip
 192.168.49.2
