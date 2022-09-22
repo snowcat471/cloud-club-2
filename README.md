@@ -169,7 +169,7 @@ web-app   1/1     Running   0          67s
 
 - Service
 
-~~~
+~~~bash
 # ClusterIP
 $ kubectl expose pod web-app --port=80 --target-port=3000 --dry-run=client -o yaml > web-app-clusterip.yaml
 $ kubectl create svc clusterip web-app --tcp=80:3000 --dry-run=client -o yaml > web-app-clusterip.yaml
@@ -236,7 +236,7 @@ spec:
   type: LoadBalancer
 ~~~
 
-~~~
+~~~bash
 # 생성
 $ kubectl apply -f <file path>
 ~~~
@@ -244,5 +244,79 @@ $ kubectl apply -f <file path>
 ### Pod 형태로 배포시 문제점
 
 - 새로운 버전 배포시 직접 새버전의 Pod를 추가하고, 구버전의 Pod를 삭제해야함
+- Scale Out 불가능
 
+## Replicaset
 
+~~~yaml
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: web-app
+  labels:
+    app: web-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web-app
+  template:
+    metadata:
+      labels:
+        app: web-app
+    spec:
+      containers:
+      - name: web-app
+        image: snowcat471/simple-app:v1
+~~~
+
+~~~bash
+# 생성
+$ kubectl apply -f rs.yaml 
+replicaset.apps/web-app created
+
+# 확인
+$ kubectl get rs
+NAME      DESIRED   CURRENT   READY   AGE
+web-app   3         3         3       22s
+
+$ kubectl get pod
+NAME            READY   STATUS    RESTARTS   AGE
+web-app-9ztw6   1/1     Running   0          43s
+web-app-k7tpf   1/1     Running   0          43s
+web-app-kdtmq   1/1     Running   0          43s
+
+# scale
+$ kubectl scale rs web-app --replicas=5
+replicaset.apps/web-app scaled
+
+$ kubectl get pod
+NAME            READY   STATUS    RESTARTS   AGE
+web-app-8r4jm   1/1     Running   0          19s
+web-app-9ztw6   1/1     Running   0          102s
+web-app-k7tpf   1/1     Running   0          102s
+web-app-kdtmq   1/1     Running   0          102s
+web-app-mv4vr   1/1     Running   0          19s
+
+# pod 삭제해보기
+$ kubectl delete pod web-app-kdtmq 
+pod "web-app-kdtmq" deleted
+
+$ kubectl get pod
+NAME            READY   STATUS    RESTARTS   AGE
+web-app-8r4jm   1/1     Running   0          2m19s
+web-app-9ztw6   1/1     Running   0          3m43s
+web-app-b8b62   1/1     Running   0          8s
+web-app-k7tpf   1/1     Running   0          3m43s
+web-app-mv4vr   1/1     Running   0          2m19s
+~~~
+
+### Replica Set 배포의 문제점
+
+- Pod와 마찬가지로 새로운 버전으로의 업데이트가 지원되지 않음
+
+## Deployment
+
+~~~yaml
+
+~~~
