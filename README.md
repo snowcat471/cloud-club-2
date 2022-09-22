@@ -318,5 +318,151 @@ web-app-mv4vr   1/1     Running   0          2m19s
 ## Deployment
 
 ~~~yaml
-
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app
+  labels:
+    app: web-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web-app
+  # strategy:
+  #   rollingUpdate:
+  #     maxSurge: 25%
+  #     maxUnavailable: 25%
+  #   type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: web-app
+    spec:
+      containers:
+      - name: web-app
+        image: snowcat471/simple-app:v1
 ~~~
+
+~~~bash
+# 생성
+$ kubectl apply -f deploy.yaml
+deployment.apps/web-app created
+
+# 확인
+$ kubectl get deploy
+NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+web-app   3/3     3            3           119s
+
+$ kubectl get rs
+NAME                 DESIRED   CURRENT   READY   AGE
+web-app-857b75488d   3         3         3       2m9s
+
+$ kubectl get pod
+NAME                       READY   STATUS    RESTARTS   AGE
+web-app-857b75488d-d2jvw   1/1     Running   0          2m22s
+web-app-857b75488d-g7nzx   1/1     Running   0          2m22s
+web-app-857b75488d-hvj9l   1/1     Running   0          2m22s
+~~~
+
+~~~bash
+# scale
+$ kubectl scale deploy web-app --replicas=7
+deployment.apps/web-app scaled
+
+$ kubectl get pod
+NAME                       READY   STATUS    RESTARTS   AGE
+web-app-857b75488d-68jjk   1/1     Running   0          11s
+web-app-857b75488d-d2jvw   1/1     Running   0          3m6s
+web-app-857b75488d-g7nzx   1/1     Running   0          3m6s
+web-app-857b75488d-hvj9l   1/1     Running   0          3m6s
+web-app-857b75488d-nn2mx   1/1     Running   0          11s
+web-app-857b75488d-xkqxt   1/1     Running   0          11s
+web-app-857b75488d-xmb79   1/1     Running   0          11s
+~~~
+
+### Deployment Update Strategy
+
+~~~bash
+$ kubectl describe deploy web-app
+Name:                   web-app
+Namespace:              default
+CreationTimestamp:      Thu, 22 Sep 2022 14:56:26 +0900
+Labels:                 app=web-app
+Annotations:            deployment.kubernetes.io/revision: 1
+Selector:               app=web-app
+Replicas:               7 desired | 7 updated | 7 total | 7 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+...
+~~~
+
+| Strategy | Description |
+|-|-|
+| RollingUpdate | 새로운 Pod를 일부 생성하고 기존 Pod를 일부 제거하는 방식으로 조금씩 업데이트 |
+| Recreate | 기존 Pod을 전부 삭제하고, 새로운 Pod들을 한번에 생성 |
+
+### Deployment Update
+
+~~~yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app
+  labels:
+    app: web-app
+spec:
+  replicas: 7
+  selector:
+    matchLabels:
+      app: web-app
+  # strategy:
+  #   rollingUpdate:
+  #     maxSurge: 25%
+  #     maxUnavailable: 25%
+  #   type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: web-app
+    spec:
+      containers:
+      - name: web-app
+        image: snowcat471/simple-app:v2 # v2로 이미지 변경
+~~~
+
+~~~bash
+# 새버전 적용
+$ kubectl apply -f deploy.yaml
+deployment.apps/web-app configured
+
+$ kubectl get pod -w
+NAME                       READY   STATUS              RESTARTS   AGE
+web-app-68f8cc6447-2dv27   0/1     ContainerCreating   0          2s
+web-app-68f8cc6447-76jn6   0/1     ContainerCreating   0          2s
+web-app-68f8cc6447-f8rpd   0/1     ContainerCreating   0          2s
+web-app-857b75488d-68jjk   1/1     Running             0          9m48s
+web-app-857b75488d-g7nzx   1/1     Running             0          12m
+web-app-857b75488d-hvj9l   1/1     Running             0          12m
+web-app-857b75488d-nn2mx   1/1     Running             0          9m48s
+web-app-857b75488d-xkqxt   1/1     Running             0          9m48s
+web-app-857b75488d-xmb79   1/1     Running             0          9m48s
+web-app-68f8cc6447-f8rpd   1/1     Running             0          7s
+web-app-857b75488d-hvj9l   1/1     Terminating         0          12m
+web-app-68f8cc6447-x7hxb   0/1     Pending             0          0s
+web-app-68f8cc6447-x7hxb   0/1     Pending             0          0s
+web-app-68f8cc6447-x7hxb   0/1     ContainerCreating   0          0s
+web-app-857b75488d-hvj9l   0/1     Terminating         0          12m
+web-app-857b75488d-hvj9l   0/1     Terminating         0          12m
+web-app-857b75488d-hvj9l   0/1     Terminating         0          12m
+web-app-68f8cc6447-x7hxb   1/1     Running             0          1s
+web-app-857b75488d-68jjk   1/1     Terminating         0          9m55s
+web-app-68f8cc6447-vttww   0/1     Pending             0          0s
+web-app-68f8cc6447-vttww   0/1     Pending             0          0s
+web-app-68f8cc6447-vttww   0/1     ContainerCreating   0          0s
+web-app-68f8cc6447-vttww   1/1     Running             0          1s
+web-app-857b75488d-xkqxt   1/1     Terminating         0          9m56s
+...
+~~~
+
